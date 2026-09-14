@@ -1,0 +1,11 @@
+# Percentage of the testing point total designated for each set of
+# tests.
+
+12.00%	tests/*-single-command
+15.00%	tests/*-single-pipe
+15.00%	tests/*-two-pipes
+11.00%	tests/*-redirection-input
+11.00%	tests/*-redirection-output
+12.00%	tests/*-redirection-complex
+15.00%	tests/*-redirection-pipes
+8.00%	tests/*-leaks.sh
