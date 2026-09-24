@@ -77,7 +77,7 @@ int main() {
         char **middle_args = NULL;
         char **right_args = NULL;
 
-        // create two pipes
+        // if there are two pipes
         if (second_pipe_index != -1) {
 
             line_words[first_pipe_index] = NULL;
@@ -130,7 +130,10 @@ int main() {
                         perror("something wrong with input");
                         exit(EXIT_FAILURE);
                     }
-                    dup2(fd_in, STDIN_FILENO);
+                    if (dup2(fd_in, STDIN_FILENO) < 0) {
+                        perror("dup2");
+                        exit(EXIT_FAILURE);
+                    }
                     close(fd_in);
                 }
                 // Child no longer needs original pipe descriptors
@@ -224,22 +227,24 @@ int main() {
                 }
 
                 // Now we apply output here
-                // This applies to all outputs but you need to make clean before running
-                // test 5 and 6a otherwise something buggy happens with the umask and data
-                // not being overwritten correctly and subsequent runs will always fail those test
-                // only the first time after running make clean will test 5 and 6a pass
+                //unlinking/deleting the output file before truncating was the solution I found
+                //because otherwise the file permissions just refuse to update without make clean
                 if (output_file != NULL) {
                     int output_fd;
                     if (append) {
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_APPEND, 0666);
                     } else {
+                        unlink(output_file);
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
                     }
                     if (output_fd < 0) {
                         perror("open output problem");
                         exit (EXIT_FAILURE);
                     }
-                    dup2(output_fd, STDOUT_FILENO);
+                    if (dup2(output_fd, STDOUT_FILENO) < 0) {
+                        perror("dup2 failed");
+                        exit(EXIT_FAILURE);
+                    }
                     close(output_fd);
                 }
 
@@ -328,7 +333,10 @@ int main() {
                         perror("something wrong with input");
                         exit(EXIT_FAILURE);
                     }
-                    dup2(fd_in, STDIN_FILENO);
+                    if (dup2(fd_in, STDIN_FILENO) < 0) {
+                        perror("dup2 failed");
+                        exit(EXIT_FAILURE);
+                    }
                     close(fd_in);
                 }
 
@@ -371,13 +379,17 @@ int main() {
                     if (append) {
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_APPEND, 0666);
                     } else {
+                        unlink(output_file);
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
                     }
                     if (output_fd < 0) {
                         perror("open output problem");
                         exit (EXIT_FAILURE);
                     }
-                    dup2(output_fd, STDOUT_FILENO);
+                    if (dup2(output_fd, STDOUT_FILENO) < 0) {
+                        perror("dup2 failed");
+                        exit(EXIT_FAILURE);
+                    }
                     close(output_fd);
                 }
 
@@ -447,13 +459,17 @@ int main() {
                     if (append) {
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_APPEND, 0666);
                     } else {
+                        unlink(output_file);
                         output_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
                     }
                     if (output_fd < 0) {
                         perror("open output problem");
                         exit (EXIT_FAILURE);
                     }
-                    dup2(output_fd, STDOUT_FILENO);
+                    if (dup2(output_fd, STDOUT_FILENO) < 0) {
+                        perror("dup2 failed");
+                        exit(EXIT_FAILURE);
+                    }
                     close(output_fd);
                 }
 
